@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <UmbracoMajor Condition="'$(UmbracoMajor)' == ''">18</UmbracoMajor>
+    <UmbracoMajor Condition="'$(UmbracoMajor)' == ''">13</UmbracoMajor>
     <TargetFramework Condition="'$(UmbracoMajor)' == '13'">net8.0</TargetFramework>
     <TargetFramework Condition="'$(UmbracoMajor)' != '13'">net10.0</TargetFramework>
     <Version>$(UmbracoMajor).0.0</Version>

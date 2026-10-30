@@ -25,7 +25,7 @@ Use the .NET 10 SDK with the .NET 8 runtime available for the 13 line. Run from 
 dotnet restore Umbraco.Community.GraphMailSender.slnx --configfile NuGet.Config
 dotnet test Umbraco.Community.GraphMailSender.slnx -c Release --no-restore
 dotnet pack src/Umbraco.Community.GraphMailSender/Umbraco.Community.GraphMailSender.csproj -c Release --no-restore -o artifacts
-python scripts/verify-package.py artifacts/Umbraco.Community.GraphMailSender.18.0.0.nupkg 18.0.0
+python scripts/verify-package.py artifacts/Umbraco.Community.GraphMailSender.13.0.0.nupkg 13.0.0
 ```
 
 Tests use fake credentials and HTTP/SMTP boundaries; they do not require or contact a Microsoft tenant. Run a real acceptance send in the target environment before production rollout. Never check credentials into fixtures.
