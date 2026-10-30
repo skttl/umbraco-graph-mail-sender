@@ -1,0 +1,6 @@
+<Project>
+  <ItemGroup>
+    <UmbracoJsonSchemaFiles Include="$(MSBuildThisFileDirectory)..\appsettings-schema.Umbraco.Community.GraphMailSender.json" Weight="-10" />
+    <JsonSchemaSegment Include="$(MSBuildThisFileDirectory)..\appsettings-schema.Umbraco.Community.GraphMailSender.json" FilePathPattern="appsettings(\..+)?\.json" />
+  </ItemGroup>
+</Project>

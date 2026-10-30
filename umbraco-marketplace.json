@@ -1,0 +1,19 @@
+{
+  "$schema": "https://marketplace.umbraco.com/umbraco-marketplace-schema.json",
+  "Title": "Graph Mail Sender",
+  "Description": "Send Umbraco email with Microsoft Graph and application authentication.",
+  "Category": "Developer Tools",
+  "LicenseTypes": [
+    "Free"
+  ],
+  "PackageType": "Package",
+  "DocumentationUrl": "https://github.com/skttl/umbraco-graph-mail-sender/blob/main/docs/nuget-readme.md",
+  "IssueTrackerUrl": "https://github.com/skttl/umbraco-graph-mail-sender/issues",
+  "Tags": [
+    "email",
+    "oauth",
+    "microsoft365",
+    "graph"
+  ],
+  "VersionDependencyMode": "SemVer"
+}

@@ -1,0 +1,37 @@
+name: Build and test
+
+on:
+  push:
+    branches: [main, v17/main, v13/main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        major: [13, 17, 18]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Restore
+        run: dotnet restore Umbraco.Community.GraphMailSender.slnx --configfile NuGet.Config -p:UmbracoMajor=${{ matrix.major }}
+      - name: Build including test site
+        run: dotnet build Umbraco.Community.GraphMailSender.slnx -c Release --no-restore -p:UmbracoMajor=${{ matrix.major }}
+      - name: Test
+        run: dotnet test Umbraco.Community.GraphMailSender.slnx -c Release --no-build --no-restore -p:UmbracoMajor=${{ matrix.major }}
+      - name: Pack
+        run: dotnet pack src/Umbraco.Community.GraphMailSender/Umbraco.Community.GraphMailSender.csproj -c Release --no-restore -p:UmbracoMajor=${{ matrix.major }} -o artifacts
+      - name: Verify package
+        run: python scripts/verify-package.py artifacts/Umbraco.Community.GraphMailSender.${{ matrix.major }}.0.0.nupkg ${{ matrix.major }}.0.0

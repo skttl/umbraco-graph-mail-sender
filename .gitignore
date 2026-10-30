@@ -1,0 +1,13 @@
+**/bin/
+**/obj/
+artifacts/
+.vs/
+TestResults/
+*.user
+*.pfx
+appsettings.*.local.json
+examples/TestSite/umbraco/
+examples/TestSite/wwwroot/umbraco/
+examples/TestSite/appsettings-schema*.json
+**/__pycache__/
+examples/TestSite/umbraco-package-schema.json
