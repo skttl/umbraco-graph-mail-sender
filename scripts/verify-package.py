@@ -7,9 +7,9 @@ import xml.etree.ElementTree as ET
 import zipfile
 
 def verify(package, version):
-    match = re.fullmatch(r"(13|17|18)\.\d+\.\d+", version)
+    match = re.fullmatch(r"(13|17|18)\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?", version)
     if not match:
-        raise ValueError("Expected a stable 13.x.x, 17.x.x or 18.x.x version")
+        raise ValueError("Expected a 13.x.x, 17.x.x or 18.x.x version with an optional prerelease suffix")
     major = int(match[1])
     expected_range = f"[{major}.0.0,{major + 1}.0.0)"
     package_id = "Umbraco.Community.GraphMailSender"
