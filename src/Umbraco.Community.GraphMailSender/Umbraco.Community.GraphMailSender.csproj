@@ -17,6 +17,7 @@
     <PackageReference Include="Umbraco.Cms.Core" Version="[13.0.0,14.0.0)" Condition="'$(UmbracoMajor)' == '13'" />
     <PackageReference Include="Umbraco.Cms.Core" Version="[17.0.0,18.0.0)" Condition="'$(UmbracoMajor)' == '17'" />
     <PackageReference Include="Umbraco.Cms.Core" Version="[18.0.0,19.0.0)" Condition="'$(UmbracoMajor)' == '18'" />
+    <PackageReference Include="Umbraco.Cms.Core" Version="[19.0.0-rc1,20.0.0)" Condition="'$(UmbracoMajor)' == '19'" />
     <PackageReference Include="Azure.Identity" Version="1.21.0" />
     <PackageReference Include="MimeKit" Version="4.18.1" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.1" Condition="'$(UmbracoMajor)' == '13'" />
@@ -30,7 +31,7 @@
     <None Include="../../appsettings-schema.Umbraco.Community.GraphMailSender.json" Pack="true" PackagePath="appsettings-schema.Umbraco.Community.GraphMailSender.json" />
     <None Include="../../buildTransitive/Umbraco.Community.GraphMailSender.targets" Pack="true" PackagePath="buildTransitive/Umbraco.Community.GraphMailSender.targets" />
   </ItemGroup>
-  <Target Name="ValidateUmbracoMajor" BeforeTargets="PrepareForBuild" Condition="'$(UmbracoMajor)' != '13' and '$(UmbracoMajor)' != '17' and '$(UmbracoMajor)' != '18'">
-    <Error Text="UmbracoMajor must be 13, 17 or 18." />
+  <Target Name="ValidateUmbracoMajor" BeforeTargets="PrepareForBuild" Condition="'$(UmbracoMajor)' != '13' and '$(UmbracoMajor)' != '17' and '$(UmbracoMajor)' != '18' and '$(UmbracoMajor)' != '19'">
+    <Error Text="UmbracoMajor must be 13, 17, 18 or 19." />
   </Target>
 </Project>

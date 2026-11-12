@@ -9,6 +9,7 @@
     <PackageReference Include="Umbraco.Cms" Version="13.0.0" Condition="'$(UmbracoMajor)' == '13'" />
     <PackageReference Include="Umbraco.Cms" Version="17.0.0" Condition="'$(UmbracoMajor)' == '17'" />
     <PackageReference Include="Umbraco.Cms" Version="18.0.0" Condition="'$(UmbracoMajor)' == '18'" />
+    <PackageReference Include="Umbraco.Cms" Version="19.0.0-rc1" Condition="'$(UmbracoMajor)' == '19'" />
     <ProjectReference Include="../../src/Umbraco.Community.GraphMailSender/Umbraco.Community.GraphMailSender.csproj" />
   </ItemGroup>
   <Import Project="../../buildTransitive/Umbraco.Community.GraphMailSender.targets" />

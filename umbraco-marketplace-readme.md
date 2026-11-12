@@ -9,9 +9,10 @@ Choose a version matching Umbraco:
 | 13 | 13.x.x | .NET 8 | [13.0.0,14.0.0) |
 | 17 | 17.x.x | .NET 10 | [17.0.0,18.0.0) |
 | 18 | 18.x.x | .NET 10 | [18.0.0,19.0.0) |
+| 19 RC1 | 19.0.0-beta01 | .NET 11 | [19.0.0-rc1,20.0.0) |
 
 ```sh
-dotnet add package Umbraco.Community.GraphMailSender --version 18.0.0
+dotnet add package Umbraco.Community.GraphMailSender --version 19.0.0-beta01
 ```
 
 Installation requires no Program.cs changes. The composer activates this sender only when `Umbraco:CMS:Global:Smtp:Graph` exists. Without that section, Umbraco's existing sender remains registered. Configure only one of Graph and OAuth. NuGet may warn rather than reject an incompatible version when the application directly overrides dependencies.

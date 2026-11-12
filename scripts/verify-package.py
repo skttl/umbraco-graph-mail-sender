@@ -7,11 +7,12 @@ import xml.etree.ElementTree as ET
 import zipfile
 
 def verify(package, version):
-    match = re.fullmatch(r"(13|17|18)\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?", version)
+    match = re.fullmatch(r"(13|17|18|19)\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?", version)
     if not match:
-        raise ValueError("Expected a 13.x.x, 17.x.x or 18.x.x version with an optional prerelease suffix")
+        raise ValueError("Expected a 13.x.x, 17.x.x, 18.x.x or 19.x.x version with an optional prerelease suffix")
     major = int(match[1])
-    expected_range = f"[{major}.0.0,{major + 1}.0.0)"
+    minimum = "19.0.0-rc1" if major == 19 else f"{major}.0.0"
+    expected_range = f"[{minimum},{major + 1}.0.0)"
     package_id = "Umbraco.Community.GraphMailSender"
     with zipfile.ZipFile(package) as archive:
         nuspec = [name for name in archive.namelist() if name.endswith(".nuspec")]
@@ -25,7 +26,7 @@ def verify(package, version):
         dependencies = [item for item in metadata.findall(".//{*}dependency") if item.get("id", "").startswith("Umbraco.Cms.")]
         if not dependencies or any(item.get("version", "").replace(" ", "") != expected_range for item in dependencies):
             raise ValueError(f"Umbraco dependencies must use {expected_range}")
-        tfm = "net8.0" if major == 13 else "net10.0"
+        tfm = "net8.0" if major == 13 else "net11.0" if major == 19 else "net10.0"
         required = {"README.md", "icon.png", "THIRD-PARTY-NOTICES.txt", f"lib/{tfm}/{package_id}.dll",
                     f"appsettings-schema.{package_id}.json", f"buildTransitive/{package_id}.targets"}
         missing = required.difference(archive.namelist())

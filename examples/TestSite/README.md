@@ -9,9 +9,9 @@ dotnet restore --configfile NuGet.Config
 dotnet run --project examples/TestSite
 ```
 
-Open http://localhost:5131/umbraco and complete the installer with your own administrator account. Development mode supplies a SQLite database under umbraco/Data/v18. The database name changes with UmbracoMajor, so switching branches never upgrades another major's database. No SQL Server is required. After installation, /testsite-status reports the Umbraco major, resolved sender type and CanSendRequiredEmail value in Development only. The launch profile binds to localhost and does not open a browser automatically.
+Open http://localhost:5131/umbraco and complete the installer with your own administrator account. Development mode supplies a SQLite database under umbraco/Data/v19. The database name changes with UmbracoMajor, so switching branches never upgrades another major's database. No SQL Server is required. After installation, /testsite-status reports the Umbraco major, resolved sender type and configuration status in Development only. The launch profile binds to localhost and does not open a browser automatically.
 
-To use another major from the same checkout, run with -p:UmbracoMajor=13 or -p:UmbracoMajor=17; include that property in restore too. Both the site and package follow the same value. The v13/main and v17/main branches set the matching value by default.
+To use another major from the same checkout, run with -p:UmbracoMajor=13, -p:UmbracoMajor=17 or -p:UmbracoMajor=18; include that property in restore too. Both the site and package follow the same value. The v13/main, v17/main and v18/main branches set the matching value by default.
 
 ## Configure a real mailbox
 

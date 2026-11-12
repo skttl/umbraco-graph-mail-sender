@@ -2,7 +2,7 @@ name: Publish to NuGet
 
 on:
   push:
-    tags: ['v13.*', 'v17.*', 'v18.*']
+    tags: ['v13.*', 'v17.*', 'v18.*', 'v19.*']
 
 jobs:
   publish:
@@ -19,13 +19,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if [[ ! "$GITHUB_REF_NAME" =~ ^v(13|17|18)\.[0-9]+\.[0-9]+(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$ ]]; then
-            echo "Expected a version tag such as v18.0.0 or v18.0.0-rc1" >&2
+          if [[ ! "$GITHUB_REF_NAME" =~ ^v(13|17|18|19)\.[0-9]+\.[0-9]+(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$ ]]; then
+            echo "Expected a version tag such as v19.0.0 or v19.0.0-rc1" >&2
             exit 1
           fi
           major="${BASH_REMATCH[1]}"
           branch="v$major/main"
-          if [[ "$major" == 18 ]]; then branch=main; fi
+          if [[ "$major" == 19 ]]; then branch=main; fi
           git merge-base --is-ancestor "$GITHUB_SHA" "refs/remotes/origin/$branch"
           declared=$(python3 -c 'import xml.etree.ElementTree as E; print(E.parse("Directory.Build.props").findtext("PropertyGroup/UmbracoMajor"))')
           if [[ "$declared" != "$major" ]]; then
@@ -39,6 +39,7 @@ jobs:
           dotnet-version: |
             8.0.x
             10.0.x
+            11.0.x
       - name: Restore
         run: dotnet restore Umbraco.Community.GraphMailSender.slnx --configfile NuGet.Config -p:UmbracoMajor="$UMBRACO_MAJOR"
       - name: Build including test site

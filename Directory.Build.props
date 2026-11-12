@@ -1,9 +1,11 @@
 <Project>
   <PropertyGroup>
-    <UmbracoMajor Condition="'$(UmbracoMajor)' == ''">18</UmbracoMajor>
+    <UmbracoMajor Condition="'$(UmbracoMajor)' == ''">19</UmbracoMajor>
     <TargetFramework Condition="'$(UmbracoMajor)' == '13'">net8.0</TargetFramework>
-    <TargetFramework Condition="'$(UmbracoMajor)' != '13'">net10.0</TargetFramework>
+    <TargetFramework Condition="'$(UmbracoMajor)' == '17' or '$(UmbracoMajor)' == '18'">net10.0</TargetFramework>
+    <TargetFramework Condition="'$(UmbracoMajor)' == '19'">net11.0</TargetFramework>
     <Version>$(UmbracoMajor).0.0</Version>
+    <Version Condition="'$(UmbracoMajor)' == '19'">19.0.0-beta01</Version>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <DefineConstants>$(DefineConstants);UMBRACO_$(UmbracoMajor)</DefineConstants>

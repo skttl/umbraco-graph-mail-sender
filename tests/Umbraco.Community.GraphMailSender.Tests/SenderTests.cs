@@ -38,6 +38,7 @@ public class SenderTests
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             Uri = request.RequestUri; Authorization = request.Headers.Authorization?.ToString();
+            if (request.Method == HttpMethod.Get) return new HttpResponseMessage(Status);
             ContentType = request.Content?.Headers.ContentType?.MediaType;
             Mime = Convert.FromBase64String(await request.Content!.ReadAsStringAsync(cancellationToken));
             return new HttpResponseMessage(Status) { Content = new StringContent("private response details") };
@@ -48,7 +49,12 @@ public class SenderTests
     {
         using var handler = new Handler(); var credential = new Credential();
         var sender = new EmailSender(Microsoft.Extensions.Options.Options.Create(Options()), Mock.Of<IEventAggregator>(), credential, handler);
+#if UMBRACO_19
+        Assert.True(sender.IsEmailConfigured());
+        Assert.Null(credential.Scopes);
+#else
         Assert.True(sender.CanSendRequiredEmail());
+#endif
         await sender.SendAsync(Message(), "test");
         Assert.Equal("https://graph.microsoft.com/v1.0/users/sender%40example.com/sendMail", handler.Uri!.AbsoluteUri);
         Assert.Equal("Bearer access-token", handler.Authorization);
@@ -97,6 +103,67 @@ public class SenderTests
         Assert.Equal("password-reset", emailType); Assert.Equal("Body", notification.Body);
         Assert.Equal(handled, handler.Uri is null);
     }
+#if UMBRACO_18 || UMBRACO_19
+    [Fact]
+    public async Task ConfiguredExpirationPreventsDelivery()
+    {
+        using var handler = new Handler();
+        var options = Options(); options.EmailExpiration = TimeSpan.Zero;
+        var sender = new EmailSender(Microsoft.Extensions.Options.Options.Create(options), Mock.Of<IEventAggregator>(), new Credential(), handler);
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => sender.SendAsync(Message(), "test"));
+        Assert.Null(handler.Uri);
+    }
+#endif
+#if UMBRACO_19
+    [Fact]
+    public async Task AvailabilityAcquiresGraphTokenWithoutSendingMail()
+    {
+        using var handler = new Handler(); var credential = new Credential();
+        var sender = new EmailSender(Microsoft.Extensions.Options.Options.Create(Options()), Mock.Of<IEventAggregator>(), credential, handler);
+        Assert.True(await sender.IsEmailAvailableAsync(CancellationToken.None));
+        Assert.Equal(new[] { "https://graph.microsoft.com/.default" }, credential.Scopes);
+        Assert.Equal("https://graph.microsoft.com/v1.0/$metadata", handler.Uri!.AbsoluteUri);
+        Assert.Equal("Bearer access-token", handler.Authorization);
+        Assert.Null(handler.Mime);
+    }
+
+    [Theory]
+    [InlineData(401)]
+    [InlineData(403)]
+    [InlineData(503)]
+    public async Task AvailabilityReturnsFalseWhenGraphIsUnavailable(int status)
+    {
+        using var handler = new Handler { Status = (HttpStatusCode)status };
+        var sender = new EmailSender(Microsoft.Extensions.Options.Options.Create(Options()), Mock.Of<IEventAggregator>(), new Credential(), handler);
+        Assert.False(await sender.IsEmailAvailableAsync(CancellationToken.None));
+        Assert.Null(handler.Mime);
+    }
+
+    [Fact]
+    public async Task AvailabilityReturnsFalseWhenAuthenticationFails()
+    {
+        using var handler = new Handler();
+        var credential = new Mock<TokenCredential>();
+        credential.Setup(x => x.GetTokenAsync(It.IsAny<TokenRequestContext>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new Azure.Identity.AuthenticationFailedException("private provider details"));
+        var sender = new EmailSender(Microsoft.Extensions.Options.Options.Create(Options()), Mock.Of<IEventAggregator>(), credential.Object, handler);
+        Assert.False(await sender.IsEmailAvailableAsync(CancellationToken.None));
+        Assert.Null(handler.Uri);
+    }
+
+    [Fact]
+    public async Task AvailabilityHonorsCancellation()
+    {
+        using var handler = new Handler();
+        using var cancellation = new CancellationTokenSource(); cancellation.Cancel();
+        var credential = new Mock<TokenCredential>();
+        credential.Setup(x => x.GetTokenAsync(It.IsAny<TokenRequestContext>(), It.IsAny<CancellationToken>()))
+            .Returns((TokenRequestContext _, CancellationToken token) => ValueTask.FromCanceled<AccessToken>(token));
+        var sender = new EmailSender(Microsoft.Extensions.Options.Options.Create(Options()), Mock.Of<IEventAggregator>(), credential.Object, handler);
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => sender.IsEmailAvailableAsync(cancellation.Token));
+        Assert.Null(handler.Uri);
+    }
+#endif
 #if !UMBRACO_13
     [Fact]
     public async Task ExpiredMessageDoesNotReachTransport()

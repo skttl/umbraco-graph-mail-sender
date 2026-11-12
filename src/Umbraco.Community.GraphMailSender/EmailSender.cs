@@ -29,9 +29,32 @@ public sealed class EmailSender : IEmailSender
         _clients = clients;
     }
 
-    public bool CanSendRequiredEmail() => true;
+#if UMBRACO_19
+    public bool IsEmailConfigured() => true;
 
-#if !UMBRACO_18
+    public async Task<bool> IsEmailAvailableAsync(CancellationToken cancellationToken = default)
+    {
+        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        timeout.CancelAfter(TimeSpan.FromSeconds(10));
+        try
+        {
+            var token = await _credential.GetTokenAsync(new TokenRequestContext(["https://graph.microsoft.com/.default"]), timeout.Token);
+            using var request = new HttpRequestMessage(HttpMethod.Get, "https://graph.microsoft.com/v1.0/$metadata");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token.Token);
+            using var client = _clients.CreateClient(MailSenderRegistration.ServiceKey);
+            using var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, timeout.Token);
+            return response.IsSuccessStatusCode;
+        }
+        catch (Exception) when (!cancellationToken.IsCancellationRequested)
+        {
+            return false;
+        }
+    }
+#else
+    public bool CanSendRequiredEmail() => true;
+#endif
+
+#if UMBRACO_13 || UMBRACO_17
     public Task SendAsync(EmailMessage message, string emailType) => SendInternalAsync(message, emailType, false, null);
     public Task SendAsync(EmailMessage message, string emailType, bool enableNotification) => SendInternalAsync(message, emailType, enableNotification, null);
 #endif
@@ -42,7 +65,7 @@ public sealed class EmailSender : IEmailSender
 
     private async Task SendInternalAsync(EmailMessage message, string emailType, bool enableNotification, TimeSpan? expires)
     {
-#if UMBRACO_18
+#if UMBRACO_18 || UMBRACO_19
         expires ??= _options.EmailExpiration;
 #endif
         if (expires <= TimeSpan.Zero) throw new OperationCanceledException("The email has expired.");

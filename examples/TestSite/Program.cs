@@ -7,8 +7,10 @@ var builder = WebApplication.CreateBuilder(args);
 const int major = 13;
 #elif UMBRACO_17
 const int major = 17;
-#else
+#elif UMBRACO_18
 const int major = 18;
+#else
+const int major = 19;
 #endif
 
 if (builder.Environment.IsDevelopment())
@@ -36,7 +38,11 @@ if (app.Environment.IsDevelopment())
     {
         UmbracoMajor = major,
         Sender = sender.GetType().FullName,
+#if UMBRACO_19
+        CanSend = sender.IsEmailConfigured()
+#else
         CanSend = sender.CanSendRequiredEmail()
+#endif
     });
 
 app.UseUmbraco()

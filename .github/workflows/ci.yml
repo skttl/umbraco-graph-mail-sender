@@ -2,7 +2,7 @@ name: Build and test
 
 on:
   push:
-    branches: [main, v17/main, v13/main]
+    branches: [main, v18/main, v17/main, v13/main]
   pull_request:
 
 permissions:
@@ -13,8 +13,10 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        major: [13, 17, 18]
+        major: [13, 17, 18, 19]
     runs-on: ${{ matrix.os }}
+    env:
+      PACKAGE_VERSION: ${{ matrix.major == 19 && '19.0.0-beta01' || format('{0}.0.0', matrix.major) }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
@@ -22,6 +24,7 @@ jobs:
           dotnet-version: |
             8.0.x
             10.0.x
+            11.0.x
       - uses: actions/setup-python@v5
         with:
           python-version: '3.x'
@@ -32,6 +35,6 @@ jobs:
       - name: Test
         run: dotnet test Umbraco.Community.GraphMailSender.slnx -c Release --no-build --no-restore -p:UmbracoMajor=${{ matrix.major }}
       - name: Pack
-        run: dotnet pack src/Umbraco.Community.GraphMailSender/Umbraco.Community.GraphMailSender.csproj -c Release --no-restore -p:UmbracoMajor=${{ matrix.major }} -o artifacts
+        run: dotnet pack src/Umbraco.Community.GraphMailSender/Umbraco.Community.GraphMailSender.csproj -c Release --no-restore -p:UmbracoMajor=${{ matrix.major }} -p:PackageVersion=${{ env.PACKAGE_VERSION }} -o artifacts
       - name: Verify package
-        run: python scripts/verify-package.py artifacts/Umbraco.Community.GraphMailSender.${{ matrix.major }}.0.0.nupkg ${{ matrix.major }}.0.0
+        run: python scripts/verify-package.py artifacts/Umbraco.Community.GraphMailSender.${{ env.PACKAGE_VERSION }}.nupkg ${{ env.PACKAGE_VERSION }}

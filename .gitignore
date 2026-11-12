@@ -1,4 +1,5 @@
 **/bin/
+.dotnet/
 **/obj/
 artifacts/
 .vs/

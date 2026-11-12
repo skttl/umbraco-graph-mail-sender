@@ -13,14 +13,17 @@ Choose a version matching Umbraco:
 | 13 | 13.x.x | .NET 8 | [13.0.0,14.0.0) |
 | 17 | 17.x.x | .NET 10 | [17.0.0,18.0.0) |
 | 18 | 18.x.x | .NET 10 | [18.0.0,19.0.0) |
+| 19 RC1 | 19.0.0-beta01 | .NET 11 | [19.0.0-rc1,20.0.0) |
 
 ```sh
-dotnet add package Umbraco.Community.GraphMailSender --version 18.0.0
+dotnet add package Umbraco.Community.GraphMailSender --version 19.0.0-beta01
 ```
 
 Installation requires no Program.cs changes. The composer activates this sender only when `Umbraco:CMS:Global:Smtp:Graph` exists. Without that section, Umbraco's existing sender remains registered. Configure only one of Graph and OAuth. NuGet may warn rather than reject an incompatible version when the application directly overrides dependencies.
 
 ## Configure
+
+Umbraco 19 uses IsEmailConfigured for configuration-only checks. IsEmailAvailableAsync acquires an Entra token and checks the Graph metadata endpoint with a ten-second timeout. It sends no email and does not verify mailbox send permissions. Caller cancellation is propagated; authentication, HTTP and timeout failures report unavailable.
 
 Add the following to appsettings.json, then supply the credential separately:
 
@@ -71,7 +74,7 @@ The sender preserves plain text/HTML, named addresses, Cc/Bcc/ReplyTo and attach
 
 The complete MIME message is limited to 3 MiB before the outer base64 encoding. Attachment reads are bounded too; MIME attachment encoding and headers count toward the final limit. Larger messages throw explicitly. Upload sessions and large attachment support are not included. HTTP 202 means accepted by Graph, not delivered.
 
-For Umbraco 17/18, expires is treated as a cancellation deadline from the start of the send, not a queued-mail TTL. Umbraco 18 also uses Smtp.EmailExpiration when expires is omitted. Network timeout or cancellation can happen after remote acceptance, so delivery status may be unknown. There is no automatic retry or background queue.
+For Umbraco 17/18/19, expires is treated as a cancellation deadline from the start of the send, not a queued-mail TTL. Umbraco 18/19 also uses Smtp.EmailExpiration when expires is omitted. Network timeout or cancellation can happen after remote acceptance, so delivery status may be unknown. There is no automatic retry or background queue.
 
 For 401/authentication errors check credential expiry, tenant/client IDs, certificate access and token resource. For 403/SMTP authorization errors check mailbox scope, Send As rights and protocol policy. Graph 429/503 failures propagate without retries. Never add blanket retry around sends without accounting for duplicates.
 

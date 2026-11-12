@@ -19,24 +19,24 @@ Microsoft Graph delivery for Umbraco IEmailSender. See [installation and configu
 
 ## Build and verify
 
-Use the .NET 10 SDK with the .NET 8 runtime available for the 13 line. Run from the repository root:
+Use the .NET 11 SDK with the .NET 8 runtime available for the 13 line and the .NET 10 runtime for 17/18. A project-local SDK in .dotnet is supported. Run from the repository root:
 
 ```sh
 dotnet restore Umbraco.Community.GraphMailSender.slnx --configfile NuGet.Config
 dotnet test Umbraco.Community.GraphMailSender.slnx -c Release --no-restore
 dotnet pack src/Umbraco.Community.GraphMailSender/Umbraco.Community.GraphMailSender.csproj -c Release --no-restore -o artifacts
-python scripts/verify-package.py artifacts/Umbraco.Community.GraphMailSender.18.0.0.nupkg 18.0.0
+python scripts/verify-package.py artifacts/Umbraco.Community.GraphMailSender.19.0.0-beta01.nupkg 19.0.0-beta01
 ```
 
 Tests use fake credentials and HTTP/SMTP boundaries; they do not require or contact a Microsoft tenant. Run a real acceptance send in the target environment before production rollout. Never check credentials into fixtures.
 
 ## Version lines and release
 
-main targets Umbraco 18, v17/main targets 17 and v13/main targets 13. Each branch uses the same package ID, version major and a bounded Umbraco dependency interval. The UmbracoMajor MSBuild property also permits local matrix verification from one checkout.
+main targets Umbraco 19 RC1, v18/main targets 18, v17/main targets 17 and v13/main targets 13. Each branch uses the same package ID, version major and a bounded Umbraco dependency interval. The UmbracoMajor MSBuild property also permits local matrix verification from one checkout.
 
-CI checks all three majors on Windows and Linux. Before publishing, create a GitHub environment named release with NUGET_USER set to the NuGet owner's account name. Configure NuGet trusted publishing for owner skttl, repository umbraco-graph-mail-sender, workflow publish.yml, environment release. No long-lived NuGet API key is stored.
+CI checks all four majors on Windows and Linux. Before publishing, create a GitHub environment named release with NUGET_USER set to the NuGet owner's account name. Configure NuGet trusted publishing for owner skttl, repository umbraco-graph-mail-sender, workflow publish.yml, environment release. No long-lived NuGet API key is stored.
 
-Tag the relevant branch with v13.0.0, v17.0.0 or v18.0.0. The workflow verifies branch ancestry, declared branch major, tests, package identity, dependency range and included assets before using GitHub OIDC to publish. Do not reuse a version NuGet has accepted.
+Tag the relevant branch with v13.0.0, v17.0.0, v18.0.0 or v19.0.0-beta01. The workflow verifies branch ancestry, declared branch major, tests, package identity, dependency range and included assets before using GitHub OIDC to publish. Do not reuse a version NuGet has accepted.
 
 No repository, remote or release tag is created by installing this package. [Design](docs/design.md) records the implementation scope.
 
