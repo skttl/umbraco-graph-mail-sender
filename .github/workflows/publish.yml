@@ -25,7 +25,6 @@ jobs:
           fi
           major="${BASH_REMATCH[1]}"
           branch="v$major/main"
-          if [[ "$major" == 18 ]]; then branch=main; fi
           git merge-base --is-ancestor "$GITHUB_SHA" "refs/remotes/origin/$branch"
           declared=$(python3 -c 'import xml.etree.ElementTree as E; print(E.parse("Directory.Build.props").findtext("PropertyGroup/UmbracoMajor"))')
           if [[ "$declared" != "$major" ]]; then

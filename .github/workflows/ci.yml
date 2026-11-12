@@ -2,7 +2,7 @@ name: Build and test
 
 on:
   push:
-    branches: [main, v17/main, v13/main]
+    branches: [main, v18/main, v17/main, v13/main]
   pull_request:
 
 permissions:
